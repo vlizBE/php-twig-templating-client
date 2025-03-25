@@ -1,0 +1,88 @@
+<?php
+
+namespace Vliz\TemplatingClient;
+
+use TemplateFormatter;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+use Twig\Markup;
+use Twig\Error\LoaderError;
+use Twig\Error\RuntimeError;
+use Twig\Error\SyntaxError;
+use Twig\Extension\DebugExtension;
+use Twig\TwigFunction;
+use Twig\TwigFilter;
+use Rize\UriTemplate;
+
+class TemplatingClient
+{
+    private Environment $twig;
+    private TemplateFormatter $templateFormatter;
+
+    public function __construct(string $templatesPath = null)
+    {
+        $loader = new FilesystemLoader($templatesPath ?? __DIR__.'/templates');
+        $this->twig = new Environment($loader, [
+            'debug' => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev'
+        ]);
+        $this->templateFormatter = new TemplateFormatter();
+    }
+
+    public function render($template, $data)
+    {
+        //ml: extend twig
+        $this->extendTwig();
+
+        try {
+            $output = $this->twig->render($template, ['_' => $data]);
+        } catch (LoaderError | RuntimeError | SyntaxError $e) {
+            //TODO: how best to return errors?
+            http_response_code(500);
+            echo $e;
+            die();
+        }
+        return $output;
+    }
+
+    private function extendTwig()
+    {
+        global $imis;
+        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev') $this->twig->addExtension(new \Twig\Extension\DebugExtension());
+
+        $uritexpand = new \Twig\TwigFunction('uritexpand', function ($template, $context) {
+            $uri = new \Rize\UriTemplate();
+            return $uri->expand($template, (array) $context);
+        });
+        $this->twig->addFunction($uritexpand);
+
+        $xsd = new \Twig\TwigFilter('xsd', function ($content, $type_name, $quote = "'") {
+            $formattedContent = $this->templateFormatter->format($content, $type_name, $quote);
+            return new Markup($formattedContent, 'UTF-8');
+        });
+        $this->twig->addFilter($xsd);
+
+        $baseRef = new \Twig\TwigFunction('baseref', function () {
+            //ml: cannot use $_SERVER variables since url is redirected in .htaccess
+            return $_ENV['MARINEINFO_BASE_REF'];
+        });
+        $this->twig->addFunction($baseRef);
+
+        $uri = new \Twig\TwigFilter('uri', function ($content) {
+            return $this->templateFormatter->uriFilter($content);
+        });
+        $this->twig->addFilter($uri);
+
+        //ml: filter to fix urls without a protocol [IMIS-1635]
+        $fixUrl = new \Twig\TwigFilter('fixUrl', function ($content) {
+            if (!$content or trim($content) == "") return "";
+            $link = $content;
+            if (!str_starts_with($content, 'http://')
+                and !str_starts_with($content, 'ftp://')
+                and !str_starts_with($content, 'https://')
+            ) $link = "http://" . $content;
+            return $link;
+        });
+        $this->twig->addFilter($fixUrl);
+    }
+
+}

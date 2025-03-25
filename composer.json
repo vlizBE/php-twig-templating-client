@@ -1,0 +1,22 @@
+{
+  "name": "vliz/templating-client",
+  "description": "A templating client wrapper around Twig with extended functionality",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Milan Lamote",
+      "email": "milan.lamote@vliz.be"
+    }
+  ],
+  "require": {
+    "php": ">=8.2",
+    "twig/twig": "^3.0",
+    "rize/uri-template": "^0.3.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Vliz\\TemplatingClient\\": "src/"
+    }
+  }
+}
