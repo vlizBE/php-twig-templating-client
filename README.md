@@ -20,6 +20,7 @@ Add the private repository to your composer.json:
 Require the package:
 ```bash
 composer require vliz/templating-client:dev-master
+```
 
 ## Usage
 
@@ -28,3 +29,4 @@ use Vliz\TemplatingClient\TemplatingClient;
 
 new TemplatingClient($pathToYourTemplatesFolder);
 echo $this->templatingClient->render($templateFileName, $dataObject);
+```
