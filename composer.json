@@ -12,7 +12,9 @@
   "require": {
     "php": ">=8.2",
     "twig/twig": "^3.0",
-    "rize/uri-template": "^0.3.0"
+    "rize/uri-template": "^0.3.0",
+    "ext-ctype": "*",
+    "ext-mbstring": "*"
   },
   "autoload": {
     "psr-4": {

@@ -1,50 +1,41 @@
 <?php
 
+namespace Vliz\TemplatingClient;
+
+use DateTimeImmutable;
+use DateTimeInterface;
+use Exception;
+
 /**
  * Class TemplateFormatter originated from https://github.com/vliz-be-opsci/py-sema
  */
 class TemplateFormatter
 {
+    /**
+     * @throws Exception
+     */
     public function format($content, $typeName, $quote = "'"): string
     {
         $suffix = null;
-        if (substr($typeName, 0, 1) === '@') {
+        if (str_starts_with($typeName, '@')) {
             $suffix = $typeName;
             $typeName = 'xsd:string';
         }
-        switch (mb_strtolower(str_replace('xsd:', '', $typeName))) {
-            case 'boolean':
-                return $this->formatBoolean($content, $quote);
-            case 'integer':
-                return $this->formatInteger($content, $quote);
-            case 'double':
-                return $this->formatDouble($content, $quote);
-            case 'date':
-                return $this->formatDate($content, $quote);
-            case 'datetime':
-                return $this->formatDateTime($content, $quote);
-            case 'anyuri':
-                return $this->formatURI($content, $quote);
-            case 'string':
-                return $this->formatString($content, $quote, $suffix);
-            case 'gyear':
-            case 'year':
-            case 'yyyy':
-                return $this->formatGYear($content, $quote);
-            case 'gyearmonth':
-            case 'year-month':
-            case 'yyyy-mm':
-                return $this->formatGYearMonth($content, $quote);
-            case 'auto-date':
-                return $this->autoDate($content, $quote);
-            case 'auto-number':
-                return $this->autoNumber($content, $quote);
-            case 'auto-any':
-            case 'auto':
-                return $this->autoAny($content, $quote);
-            default:
-                return $content;
-        }
+        return match (mb_strtolower(str_replace('xsd:', '', $typeName))) {
+            'boolean' => $this->formatBoolean($content, $quote),
+            'integer' => $this->formatInteger($content, $quote),
+            'double' => $this->formatDouble($content, $quote),
+            'date' => $this->formatDate($content, $quote),
+            'datetime' => $this->formatDateTime($content, $quote),
+            'anyuri' => $this->formatURI($content, $quote),
+            'string' => $this->formatString($content, $quote, $suffix),
+            'gyear', 'year', 'yyyy' => $this->formatGYear($content, $quote),
+            'gyearmonth', 'year-month', 'yyyy-mm' => $this->formatGYearMonth($content, $quote),
+            'auto-date' => $this->autoDate($content, $quote),
+            'auto-number' => $this->autoNumber($content, $quote),
+            'auto-any', 'auto' => $this->autoAny($content, $quote),
+            default => $content,
+        };
     }
 
     private function value($content, $quote, $typeName, $suffix = null): string
@@ -104,7 +95,8 @@ class TemplateFormatter
         return $this->value($content, $quote, 'xsd:dateTime');
     }
 
-    private function cleanURI($uri) {
+    private function cleanURI($uri): string
+    {
         $uri = str_replace(['[', ']', '<', '>'], ['%5B', '%5D', '%3C', '%3E'], $uri);
         if ($this->isValidUri($uri)) {
             return $uri;
@@ -119,9 +111,10 @@ class TemplateFormatter
         return $this->value($uri, $quote, 'xsd:anyURI');
     }
 
-    private function isValidUri($uri) {
+    private function isValidUri($uri): bool
+    {
         // Checks if the URI starts with "urn:"
-        if (strpos($uri, "urn:") === 0) {
+        if (str_starts_with($uri, "urn:")) {
             // If so, prepend "http://make.safe/" to the URI
             $uri = "http://make.safe/" . $uri;
         }
@@ -148,7 +141,8 @@ class TemplateFormatter
         return $this->value($content, $quote, "xsd:string", $suffix);
     }
 
-    public function uriFilter($uri) {
+    public function uriFilter($uri): string
+    {
         //ml: escape square brackets in URIs [IMIS-1505]
         $uri = $this->cleanURI($uri);
         return "<{$uri}>";
@@ -193,6 +187,9 @@ class TemplateFormatter
         return $this->value($content, $quote, 'xsd:gYearMonth');
     }
 
+    /**
+     * @throws Exception
+     */
     private function autoDate($content, $quote): string
     {
         // infer type from input + apply formatting according to fallback-scenario
@@ -232,7 +229,7 @@ class TemplateFormatter
         foreach ($patterns as $pattern => $formatter) {
             if (preg_match($pattern, $content)) {
                 try {
-                    new DateTime($content);
+                    new \DateTime($content);
                     return $this->$formatter($content, $quote);
                 } catch (Exception $e) {
                     // continue to next pattern
@@ -242,6 +239,9 @@ class TemplateFormatter
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
     private function autoNumber($content, $quote): string
     {
         // infer type from input + apply formatting according to fallback-scenario
@@ -278,6 +278,9 @@ class TemplateFormatter
         return null;
     }
 
+    /**
+     * @throws Exception
+     */
     private function autoAny($content, $quote): string
     {
         // infer type from input + apply formatting according to fallback-scenario

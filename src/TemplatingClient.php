@@ -2,7 +2,6 @@
 
 namespace Vliz\TemplatingClient;
 
-use TemplateFormatter;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Twig\Markup;
@@ -21,7 +20,7 @@ class TemplatingClient
 
     public function __construct(string $templatesPath = null)
     {
-        $loader = new FilesystemLoader($templatesPath ?? __DIR__.'/templates');
+        $loader = new FilesystemLoader($templatesPath);
         $this->twig = new Environment($loader, [
             'debug' => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev'
         ]);
@@ -44,36 +43,35 @@ class TemplatingClient
         return $output;
     }
 
-    private function extendTwig()
+    private function extendTwig(): void
     {
-        global $imis;
-        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev') $this->twig->addExtension(new \Twig\Extension\DebugExtension());
+        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev') $this->twig->addExtension(new DebugExtension());
 
-        $uritexpand = new \Twig\TwigFunction('uritexpand', function ($template, $context) {
-            $uri = new \Rize\UriTemplate();
+        $uritexpand = new TwigFunction('uritexpand', function ($template, $context) {
+            $uri = new UriTemplate();
             return $uri->expand($template, (array) $context);
         });
         $this->twig->addFunction($uritexpand);
 
-        $xsd = new \Twig\TwigFilter('xsd', function ($content, $type_name, $quote = "'") {
+        $xsd = new TwigFilter('xsd', function ($content, $type_name, $quote = "'") {
             $formattedContent = $this->templateFormatter->format($content, $type_name, $quote);
             return new Markup($formattedContent, 'UTF-8');
         });
         $this->twig->addFilter($xsd);
 
-        $baseRef = new \Twig\TwigFunction('baseref', function () {
+        $baseRef = new TwigFunction('baseref', function () {
             //ml: cannot use $_SERVER variables since url is redirected in .htaccess
             return $_ENV['MARINEINFO_BASE_REF'];
         });
         $this->twig->addFunction($baseRef);
 
-        $uri = new \Twig\TwigFilter('uri', function ($content) {
+        $uri = new TwigFilter('uri', function ($content) {
             return $this->templateFormatter->uriFilter($content);
         });
         $this->twig->addFilter($uri);
 
         //ml: filter to fix urls without a protocol [IMIS-1635]
-        $fixUrl = new \Twig\TwigFilter('fixUrl', function ($content) {
+        $fixUrl = new TwigFilter('fixUrl', function ($content) {
             if (!$content or trim($content) == "") return "";
             $link = $content;
             if (!str_starts_with($content, 'http://')
