@@ -60,8 +60,7 @@ class TemplatingClient
         $this->twig->addFilter($xsd);
 
         $baseRef = new TwigFunction('baseref', function () {
-            //ml: cannot use $_SERVER variables since url is redirected in .htaccess
-            return $_ENV['MARINEINFO_BASE_REF'];
+            return $_ENV['BASE_REF'];
         });
         $this->twig->addFunction($baseRef);
 

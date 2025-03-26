@@ -1,5 +1,5 @@
 {
-  "name": "vliz/templating-client",
+  "name": "vliz/php-twig-templating-client",
   "description": "A templating client wrapper around Twig with extended functionality",
   "type": "library",
   "license": "MIT",
