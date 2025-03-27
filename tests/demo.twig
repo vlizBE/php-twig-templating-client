@@ -1,4 +1,7 @@
-{% autoescape false %}
+
+INPUT: {{"Testing \\\"'escaper"|lower}}
+OUTPUT: testing \\\"'escaper
+
 INPUT: {{ uritexpand("/{param}/url",{"param":'value'}) }}
 OUTPUT: /value/url
 
@@ -39,4 +42,3 @@ OUTPUT: <http://www.example.com>
 
 INPUT: {{ "www.example.com"|fixUrl }}
 OUTPUT: http://www.example.com
-{% endautoescape %}

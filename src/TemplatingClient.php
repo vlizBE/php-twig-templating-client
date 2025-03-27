@@ -8,6 +8,7 @@ use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
+use Twig\Runtime\EscaperRuntime;
 use Twig\TemplateWrapper;
 
 class TemplatingClient
@@ -22,9 +23,21 @@ class TemplatingClient
     {
         $loader = new FilesystemLoader($templatesPath);
         $options = array_merge([
-            'debug' => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev'
+            'debug' => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'dev',
+            'autoescape' => 'turtle',
+
         ], $options);
         $this->twig = new Environment($loader, $options);
+
+        //Add an escaper for turtle literals.
+        //The 'turtle' escape mode escapes \ and " , so should be delimited by "double qoutes"
+        //See https://www.w3.org/TR/turtle/#turtle-literals
+        $this->twig->getRuntime(EscaperRuntime::class)->setEscaper('turtle', function ($input) {
+            if (is_null($input)) {
+                return "";
+            }
+            return strtr($input, ["\"" => "\\\"", "\\" => "\\\\", "\n" => "\\n", "\r" => "\\r"]);
+        });
         if ($options['debug']) {
             $this->twig->addExtension(new DebugExtension());
         }
