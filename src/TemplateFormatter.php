@@ -46,15 +46,11 @@ class TemplateFormatter
         return $quote . $content . $quote . $suffix;
     }
 
-
     private function formatBoolean($content, $quote): string
     {
-        // make rigid bool
-        if (!is_bool($content)) {
-            $content = !in_array(strtolower((string) $content), ['', '0', 'no', 'false', 'off']);
-        }
-        // serialize to string again
-        return $this->value(strtolower((string) $content), $quote, 'xsd:boolean');
+        $validContent = filter_var($content, FILTER_VALIDATE_BOOLEAN);
+        $rendered = $validContent ? 'true' : 'false';
+        return $this->value($rendered, $quote, 'xsd:boolean');
     }
 
     private function formatInteger($content, $quote): string

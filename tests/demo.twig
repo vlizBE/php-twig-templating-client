@@ -3,12 +3,10 @@ INPUT: {{ uritexpand("/{param}/url",{"param":'value'}) }}
 OUTPUT: /value/url
 
 INPUT: {{ "true"|xsd('boolean') }}
-OUTPUT: '1'^^xsd:boolean
-#TODO pas aan naar true and false
+OUTPUT: 'true'^^xsd:boolean
 
-#INPUT: {{ "false"|xsd('boolean') }}
-#OUTPUT: '0'^^xsd:boolean
-#FIXME this outputs ''^^xsd:boolean'
+INPUT: {{ "false"|xsd('boolean') }}
+OUTPUT: 'false'^^xsd:boolean
 
 INPUT: {{ "800903"|xsd('integer') }}
 OUTPUT: '800903'^^xsd:integer
