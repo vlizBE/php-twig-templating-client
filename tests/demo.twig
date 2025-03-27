@@ -1,0 +1,44 @@
+{% autoescape false %}
+INPUT: {{ uritexpand("/{param}/url",{"param":'value'}) }}
+OUTPUT: /value/url
+
+INPUT: {{ "true"|xsd('boolean') }}
+OUTPUT: '1'^^xsd:boolean
+#TODO pas aan naar true and false
+
+#INPUT: {{ "false"|xsd('boolean') }}
+#OUTPUT: '0'^^xsd:boolean
+#FIXME this outputs ''^^xsd:boolean'
+
+INPUT: {{ "800903"|xsd('integer') }}
+OUTPUT: '800903'^^xsd:integer
+
+INPUT: {{ "1.234"|xsd('double') }}
+OUTPUT: '1.234'^^xsd:double
+
+INPUT: {{ "1980-09-03"|xsd('date') }}
+OUTPUT: '1980-09-03'^^xsd:date
+
+INPUT: {{ "1980-09-03"|xsd('datetime') }}
+OUTPUT: '1980-09-03'^^xsd:dateTime
+
+INPUT: {{ "http://vliz.be?weirdchars=[]<>"|xsd('anyURI') }}
+OUTPUT: 'http://vliz.be?weirdchars=%5B%5D%3C%3E'^^xsd:anyURI
+
+INPUT: {{ "1980"|xsd('gYear') }}
+OUTPUT: '1980'^^xsd:gYear
+
+INPUT: {{ "1980-03"|xsd('gYearMonth') }}
+OUTPUT: '1980-03'^^xsd:gYearMonth
+
+#FIXME auto-date auto-number auto-any - how do they work?
+
+INPUT: {{ baseref() }}
+OUTPUT: https://marineinfo.org/
+
+INPUT: {{ "http://www.example.com"|uri }}
+OUTPUT: <http://www.example.com>
+
+INPUT: {{ "www.example.com"|fixUrl }}
+OUTPUT: http://www.example.com
+{% endautoescape %}
