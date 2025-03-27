@@ -48,6 +48,7 @@ class TemplatingClient
      * @param string|TemplateWrapper $template Argument for twig->render
      * @param array $data Argument for twig->render
      * @return string Result for twig->render
+     * @throws ResponseException if anything goes wrong
      */
     public function render(string|TemplateWrapper $template, array $data): string
     {
@@ -55,12 +56,19 @@ class TemplatingClient
             return $this->twig->render($template, $data);
         } catch (Exception $e) {
             $response = "Internal Error\n";
-            http_response_code(500);
             if ($this->twig->isDebug()) {
                 $response .= "Exception:\n" . var_export($e, true) . "\n";
                 $response .= "Data:\n" . var_export($data, true) . "\n";
             }
-            return $response;
+            throw new ResponseException($response, 500);
         }
+    }
+
+    /**
+     * @return Environment
+     */
+    public function getTwigEnvironment(): Environment
+    {
+        return $this->twig;
     }
 }

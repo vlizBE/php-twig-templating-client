@@ -29,18 +29,26 @@ class TemplatingClientTest extends TestCase
 
     function testCrashNoDebug()
     {
-        $client = new TemplatingClient("tests", ["debug" => false]);
-        $output = $client->render("thisdoesnotexist.twig", []);
-        Assert::assertEquals(500, http_response_code());
-        Assert::assertEquals("Internal Error\n", $output);
+        try {
+            $client = new TemplatingClient("tests", ["debug" => false]);
+            $client->render("thisdoesnotexist.twig", []);
+            Assert::fail("Should have thrown");
+        } catch (ResponseException $e) {
+            Assert::assertEquals(500, $e->getCode());
+            Assert::assertEquals("Internal Error\n", $e->getMessage());
+        }
     }
 
     function testCrashWithDebug()
     {
-        $client = new TemplatingClient("tests", ["debug" => true]);
-        $output = $client->render("thisdoesnotexist.twig", []);
-        Assert::assertEquals(500, http_response_code());
-        Assert::assertStringContainsString("Exception", $output);
+        try {
+            $client = new TemplatingClient("tests", ["debug" => true]);
+            $client->render("thisdoesnotexist.twig", []);
+            Assert::fail("Should have thrown");
+        } catch (ResponseException $e) {
+            Assert::assertEquals(500, $e->getCode());
+            Assert::assertStringContainsString("Exception", $e->getMessage());
+        }
     }
 
 }

@@ -14,7 +14,8 @@
     "twig/twig": "^3.0",
     "rize/uri-template": "^0.3.0",
     "ext-ctype": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "easyrdf/easyrdf": "^1.1"
   },
   "autoload": {
     "psr-4": {
