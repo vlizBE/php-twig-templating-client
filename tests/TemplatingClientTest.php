@@ -26,4 +26,21 @@ class TemplatingClientTest extends TestCase
             }
         }
     }
+
+    function testCrashNoDebug()
+    {
+        $client = new TemplatingClient("tests", ["debug" => false]);
+        $output = $client->render("thisdoesnotexist.twig", []);
+        Assert::assertEquals(500, http_response_code());
+        Assert::assertEquals("Internal Error\n", $output);
+    }
+
+    function testCrashWithDebug()
+    {
+        $client = new TemplatingClient("tests", ["debug" => true]);
+        $output = $client->render("thisdoesnotexist.twig", []);
+        Assert::assertEquals(500, http_response_code());
+        Assert::assertStringContainsString("Exception", $output);
+    }
+
 }

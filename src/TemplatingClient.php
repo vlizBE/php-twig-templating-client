@@ -2,10 +2,8 @@
 
 namespace Vliz\TemplatingClient;
 
+use Exception;
 use Twig\Environment;
-use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
-use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 use Twig\Runtime\EscaperRuntime;
@@ -54,13 +52,15 @@ class TemplatingClient
     public function render(string|TemplateWrapper $template, array $data): string
     {
         try {
-            $output = $this->twig->render($template, $data);
-        } catch (LoaderError|RuntimeError|SyntaxError $e) {
-            //TODO: how best to return errors?
+            return $this->twig->render($template, $data);
+        } catch (Exception $e) {
+            $response = "Internal Error\n";
             http_response_code(500);
-            echo $e;
-            die();
+            if ($this->twig->isDebug()) {
+                $response .= "Exception:\n" . var_export($e, true) . "\n";
+                $response .= "Data:\n" . var_export($data, true) . "\n";
+            }
+            return $response;
         }
-        return $output;
     }
 }
