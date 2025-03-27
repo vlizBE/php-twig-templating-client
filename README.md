@@ -47,3 +47,5 @@ schema:url {{url.URL | trim | uri }} ;
 //filter fixUrl adds protocol to url
 <dd><a href="{{url.URL | fixUrl}}">{{url.URL}}</a></dd>
 ```
+
+See tests/demo.twig for more examples
