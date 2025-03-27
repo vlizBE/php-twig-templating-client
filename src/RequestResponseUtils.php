@@ -82,7 +82,7 @@ class RequestResponseUtils
      * @param string $formatName
      * @return void
      */
-    public function respond(
+    public static function respond(
         TemplatingClient $client,
         string|TemplateWrapper $template,
         array $data,
