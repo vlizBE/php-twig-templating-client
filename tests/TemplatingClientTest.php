@@ -9,11 +9,10 @@ class TemplatingClientTest extends TestCase
 {
     function testSomething()
     {
-        $_ENV['BASE_REF']='https://marineinfo.org/';
+        $_ENV['BASE_REF'] = 'https://marineinfo.org/';
         $client = new TemplatingClient("tests");
         $template = "demo.twig";
         $output = $client->render($template, "nothing");
-        //$output = $client->render($template, ["_"=>"nothing","baseref"=>"ksdlfjksql"]);
 
         // Assert INPUT: and OUTPUT: lines are the same
         $lineno = 0;
