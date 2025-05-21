@@ -86,7 +86,7 @@ class TemplateFormatter
     {
         // try to parse, otherwise just return the value
         if (strtotime($content)) {
-            $content = date($content);
+            $content = (new DateTime($content))->format('Y-m-d\TH:i:sP');
         }
         return $this->value($content, $quote, 'xsd:dateTime');
     }
