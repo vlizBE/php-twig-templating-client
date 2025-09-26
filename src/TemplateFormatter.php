@@ -76,8 +76,11 @@ class TemplateFormatter
     private function formatDate($content, $quote): string
     {
         // try to parse, otherwise just return the value
-        if (strtotime($content)) {
-            $content = date($content);
+        if($content instanceof DateTimeInterface) {
+            // Date/time without time zone
+            $content = $content->format('Y-m-d');
+        }elseif (strtotime($content)!==false) {
+            $content = date('Y-m-d',strtotime($content));
         }
         return $this->value($content, $quote, 'xsd:date');
     }
@@ -85,8 +88,12 @@ class TemplateFormatter
     private function formatDateTime($content, $quote): string
     {
         // try to parse, otherwise just return the value
-        if (strtotime($content)) {
-            $content = date($content);
+        $dateTimeNoTZ = 'Y-m-d\\TH:i:s';
+        if($content instanceof DateTimeInterface) {
+            // Date/time without time zone
+            $content = $content->format($dateTimeNoTZ);
+        }elseif(strtotime($content)) {
+            $content = date($dateTimeNoTZ,strtotime($content));
         }
         return $this->value($content, $quote, 'xsd:dateTime');
     }
