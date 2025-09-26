@@ -88,12 +88,12 @@ class TemplateFormatter
     private function formatDateTime($content, $quote): string
     {
         // try to parse, otherwise just return the value
-        $dateTimeNoTZ = 'Y-m-d\\TH:i:s';
+        $format = 'Y-m-d\\TH:i:sP';
         if($content instanceof DateTimeInterface) {
             // Date/time without time zone
-            $content = $content->format($dateTimeNoTZ);
+            $content = $content->format($format);
         }elseif(strtotime($content)) {
-            $content = date($dateTimeNoTZ,strtotime($content));
+            $content = date($format,strtotime($content));
         }
         return $this->value($content, $quote, 'xsd:dateTime');
     }

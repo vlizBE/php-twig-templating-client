@@ -21,7 +21,7 @@ INPUT: {{ "1980-09-03"|xsd('date') }}
 OUTPUT: '1980-09-03'^^xsd:date
 
 INPUT: {{ "1980-09-03T14:20:07"|xsd('datetime') }}
-OUTPUT: '1980-09-03T14:20:07'^^xsd:dateTime
+OUTPUT: '1980-09-03T14:20:07+00:00'^^xsd:dateTime
 
 INPUT: {{ "http://vliz.be?weirdchars=[]<>"|xsd('anyURI') }}
 OUTPUT: 'http://vliz.be?weirdchars=%5B%5D%3C%3E'^^xsd:anyURI
